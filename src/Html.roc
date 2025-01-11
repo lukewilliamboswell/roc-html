@@ -148,8 +148,8 @@ Node : [Element Str U64 (List Attribute) (List Node), Text Str, UnescapedHtml St
 ##
 ## ```
 ## expect
-##     textNode = Html.text "<script>alert('hi')</script>"
-##     Html.renderWithoutDocType textNode == "&lt;script&gt;alert(&#39;hi&#39;)&lt;/script&gt;"
+##     textNode = Html.text("<script>alert('hi')</script>")
+##     Html.render_without_doc_type(textNode) == "&lt;script&gt;alert(&#39;hi&#39;)&lt;/script&gt;"
 ## ```
 text : Str -> Node
 text = Text
@@ -166,8 +166,8 @@ expect
 ##
 ## ```
 ## expect
-##     htmlNode = Html.dangerouslyIncludeUnescapedHtml "<script>alert('This JavaScript will run')</script>"
-##     Html.renderWithoutDocType htmlNode ==  "<script>alert('This JavaScript will run')</script>"
+##     htmlNode = Html.dangerously_include_unescaped_html("<script>alert('This JavaScript will run')</script>")
+##     Html.render_without_doc_type(htmlNode) == "<script>alert('This JavaScript will run')</script>"
 ## ```
 dangerously_include_unescaped_html : Str -> Node
 dangerously_include_unescaped_html = UnescapedHtml
@@ -183,9 +183,9 @@ expect
 ##
 ## ```
 ## blink : List Attribute, List Node -> Node
-## blink = element "blink"
+## blink = element("blink")
 ##
-## blink [] [ text "This text is blinking!" ]
+## blink [] [ text("This text is blinking!") ]
 ## ```
 element : Str -> (List Attribute, List Node -> Node)
 element = \tag_name ->
@@ -243,7 +243,7 @@ node_size = \node ->
 ##
 ## The output has no whitespace between nodes, to make it small.
 ## This is intended for generating full HTML documents, so it automatically adds `<!DOCTYPE html>` to the start of the string.
-## See also `renderWithoutDocType`.
+## See also `render_without_doc_type`.
 render : Node -> Str
 render = \node ->
     buffer = SafeStr.reserve(dangerously_mark_safe("<!DOCTYPE html>"), node_size(node))
