@@ -1,6 +1,5 @@
 app [main!] {
-    # TODO replace with release URL
-    cli: platform "../../basic-cli/platform/main.roc",
+    cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.19.0/bi5zubJ-_Hva9vxxPq4kNx4WHX6oFs8OP6Ad0tCYlrY.tar.br",
     html: "../src/main.roc",
 }
 
@@ -8,7 +7,7 @@ import cli.Stdout
 import html.Html
 import html.Attribute
 
-main! = \_args ->
+main! = |_args|
     page = Html.html(
         [],
         [

@@ -14,7 +14,7 @@ SafeStr := Str
 ## Escape a string so that it can safely be used in HTML text nodes or attributes.
 ## This is the function that should usually be used for converting a Str to a SafeStr.
 escape : Str -> SafeStr
-escape = \str ->
+escape = |str|
     (encoded_bytes, is_original_string_fine) =
         # We allocate more bytes than the original string had because we'll need extra bytes
         # if there are any characters we need to escape. My choice of the proportion 3/2
@@ -29,7 +29,7 @@ escape = \str ->
         Str.walk_utf8(
             str,
             (bytes, Bool.true),
-            \(bytes_so_far, is_original_string_fine_so_far), byte ->
+            |(bytes_so_far, is_original_string_fine_so_far), byte|
                 when byte is
                     34 -> (List.concat(bytes_so_far, Str.to_utf8("&quot;")), Bool.false) # " must be escaped
                     38 -> (List.concat(bytes_so_far, Str.to_utf8("&amp;")), Bool.false) # & must be escaped
@@ -50,7 +50,7 @@ escape = \str ->
 
 ## Convert a SafeStr to a regular Str.
 to_str : SafeStr -> Str
-to_str = \@SafeStr(str) -> str
+to_str = |@SafeStr(str)| str
 
 expect to_str(escape("<h1>abc</h1>")) == "&lt;h1&gt;abc&lt;/h1&gt;"
 expect to_str(escape("abc")) == "abc"
@@ -72,7 +72,7 @@ expect to_str(escape("something؀<h1>͏bad؀</h1>͏something")) == "something؀&
 ## DO NOT use this function unless you know the input string is safe.
 ## NEVER use this function on user input.
 dangerously_mark_safe : Str -> SafeStr
-dangerously_mark_safe = \str -> @SafeStr(str)
+dangerously_mark_safe = |str| @SafeStr(str)
 
 expect
     bad_str = "<script>alert('&bad' + \"script\")</script>"
@@ -80,21 +80,21 @@ expect
 
 ## The SafeStr equivalent of Str.withCapacity
 with_capacity : U64 -> SafeStr
-with_capacity = \capacity ->
+with_capacity = |capacity|
     @SafeStr(Str.with_capacity(capacity))
 
 expect to_str(with_capacity(10)) == ""
 
 ## The SafeStr equivalent of Str.reserve
 reserve : SafeStr, U64 -> SafeStr
-reserve = \@SafeStr(str), additional_capacity ->
+reserve = |@SafeStr(str), additional_capacity|
     @SafeStr(Str.reserve(str, additional_capacity))
 
 expect "abc>" |> escape |> reserve(50) |> to_str == "abc&gt;"
 
 ## The SafeStr equivalent of Str.concat
 concat : SafeStr, SafeStr -> SafeStr
-concat = \@SafeStr(str1), @SafeStr(str2) ->
+concat = |@SafeStr(str1), @SafeStr(str2)|
     # If two strings are HTML-safe, their concatenation must be too.
     @SafeStr(Str.concat(str1, str2))
 

@@ -139,8 +139,8 @@ Attribute : [Attribute Str Str]
 ## Define a non-standard attribute.
 ## You can use this to add attributes that are not already supported.
 attribute : Str -> (Str -> Attribute)
-attribute = \attr_name ->
-    \attr_value -> Attribute(attr_name, attr_value)
+attribute = |attr_name|
+    |attr_value| Attribute(attr_name, attr_value)
 
 ## Construct a `accept` attribute.
 accept : Str -> Attribute

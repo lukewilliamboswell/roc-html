@@ -188,20 +188,20 @@ expect
 ## blink [] [ text("This text is blinking!") ]
 ## ```
 element : Str -> (List Attribute, List Node -> Node)
-element = \tag_name ->
-    \attrs, children ->
+element = |tag_name|
+    |attrs, children|
         # While building the node tree, calculate the size of Str it will render to
         with_tag = 2 * (3 + Str.count_utf8_bytes(tag_name))
         with_attrs = List.walk(
             attrs,
             with_tag,
-            \acc, Attribute(name, val) ->
+            |acc, Attribute(name, val)|
                 acc + Str.count_utf8_bytes(name) + Str.count_utf8_bytes(val) + 4,
         )
         total_size = List.walk(
             children,
             with_attrs,
-            \acc, child ->
+            |acc, child|
                 acc + node_size(child),
         )
 
@@ -210,14 +210,14 @@ element = \tag_name ->
 ## Define a non-standard HTML [void element](https://developer.mozilla.org/en-US/docs/Glossary/Void_element).
 ## A void element is an element that cannot have any children.
 void_element : Str -> (List Attribute -> Node)
-void_element = \tag_name ->
-    \attrs ->
+void_element = |tag_name|
+    |attrs|
         # While building the node tree, calculate the size of Str it will render to
         with_tag = 2 * (3 + Str.count_utf8_bytes(tag_name))
         with_attrs = List.walk(
             attrs,
             with_tag,
-            \acc, Attribute(name, val) ->
+            |acc, Attribute(name, val)|
                 acc + Str.count_utf8_bytes(name) + Str.count_utf8_bytes(val) + 4,
         )
 
@@ -225,7 +225,7 @@ void_element = \tag_name ->
 
 ## Internal helper to calculate the size of a node
 node_size : Node -> U64
-node_size = \node ->
+node_size = |node|
     when node is
         Text(content) ->
             # We allocate more bytes than the original string had because we'll need extra bytes
@@ -245,7 +245,7 @@ node_size = \node ->
 ## This is intended for generating full HTML documents, so it automatically adds `<!DOCTYPE html>` to the start of the string.
 ## See also `render_without_doc_type`.
 render : Node -> Str
-render = \node ->
+render = |node|
     buffer = SafeStr.reserve(dangerously_mark_safe("<!DOCTYPE html>"), node_size(node))
 
     render_help(buffer, node)
@@ -273,7 +273,7 @@ expect
 
 ## Render a Node to a string, without a `!DOCTYPE` tag.
 render_without_doc_type : Node -> Str
-render_without_doc_type = \node ->
+render_without_doc_type = |node|
     buffer = SafeStr.with_capacity(node_size(node))
 
     render_help(buffer, node)
@@ -281,7 +281,7 @@ render_without_doc_type = \node ->
 
 ## An internal helper to render a node to a string buffer.
 render_help : SafeStr, Node -> SafeStr
-render_help = \buffer, node ->
+render_help = |buffer, node|
     when node is
         Text(content) ->
             SafeStr.concat(buffer, escape(content))
@@ -296,7 +296,7 @@ render_help = \buffer, node ->
                     buffer
                     |> SafeStr.concat(dangerously_mark_safe("<"))
                     |> SafeStr.concat(dangerously_mark_safe(tag_name))
-                    |> \with_tag_name ->
+                    |> |with_tag_name|
                         if List.is_empty(attrs) then
                             with_tag_name
                         else
@@ -307,20 +307,20 @@ render_help = \buffer, node ->
                     buffer
                     |> SafeStr.concat(dangerously_mark_safe("<"))
                     |> SafeStr.concat(dangerously_mark_safe(tag_name))
-                    |> \with_tag_name ->
+                    |> |with_tag_name|
                         if List.is_empty(attrs) then
                             with_tag_name
                         else
                             List.walk(attrs, with_tag_name, render_attr)
                     |> SafeStr.concat(dangerously_mark_safe(">"))
-                    |> \with_tag -> List.walk(children, with_tag, render_help)
+                    |> |with_tag| List.walk(children, with_tag, render_help)
                     |> SafeStr.concat(dangerously_mark_safe("</"))
                     |> SafeStr.concat(dangerously_mark_safe(tag_name))
                     |> SafeStr.concat(dangerously_mark_safe(">"))
 
 ## An internal helper to render an attribute to a string buffer.
 render_attr : SafeStr, Attribute -> SafeStr
-render_attr = \buffer, Attribute(key, value) ->
+render_attr = |buffer, Attribute(key, value)|
     buffer
     |> SafeStr.concat(dangerously_mark_safe(" "))
     |> SafeStr.concat(dangerously_mark_safe(key))
